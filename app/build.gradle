@@ -1,23 +1,37 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
-    
+    compileSdkVersion 34
+    buildToolsVersion "34.0.0"
+
     defaultConfig {
         applicationId "com.ojang.nullstone"
-        minSdkVersion 21
-        targetSdkVersion 23
+        minSdkVersion 21              // ← 从 1 改成 21
+        targetSdkVersion 34
         versionCode 1
-        versionName "0.1.0"
+        versionName "1.0"
     }
+
     buildTypes {
         release {
             minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                          'proguard-rules.pro'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // ← 加这一段：ogg 不压缩（音乐播放必需）
+    aaptOptions {
+        noCompress "ogg"
     }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.4.0'
+    // 你原来有什么依赖就保留，比如：
+    // implementation 'com.android.support:appcompat-v7:23.4.0'
 }

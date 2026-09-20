@@ -23,6 +23,18 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class GameActivity extends Activity {
 
+    // ===== 游戏内音乐（想加就加）=====
+    private static final String[] GAME_MUSIC = {
+        "music/menu1.ogg",
+        "music/menu2.ogg",
+        "music/menu3.ogg"
+    };
+    // 如果你以后有单独的游戏音乐，改成：
+    // private static final String[] GAME_MUSIC = {
+    //     "music/game1.ogg",
+    //     "music/game2.ogg"
+    // };
+
     private GLSurfaceView glView;
     private FrameLayout rootLayout;
 
@@ -64,7 +76,7 @@ public class GameActivity extends Activity {
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT));
 
-        // ===== 准星（十字） =====
+        // ===== 准星 =====
         View crosshair = new View(this) {
             private final Paint p = new Paint();
             {
@@ -145,7 +157,33 @@ public class GameActivity extends Activity {
         rootLayout.addView(controlLayer);
 
         setContentView(rootLayout);
+
+        // ===== 开始游戏音乐 =====
+        MusicPlayer.getInstance(this).playScene("game", GAME_MUSIC);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (glView != null) glView.onResume();
+
+        // 回到游戏，确保游戏音乐在播
+        MusicPlayer.getInstance(this).playScene("game", GAME_MUSIC);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (glView != null) glView.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        NativeLib.destroyWorld();
+    }
+
+    // ============ 以下原有逻辑全部不动 ============
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
@@ -295,9 +333,6 @@ public class GameActivity extends Activity {
         return (int)(dp * density + 0.5f);
     }
 
-    // ============================================================
-    //                    从 assets/blocks/ 拼 atlas
-    // ============================================================
     private Bitmap buildAtlas() {
         String[] names = {
             "grass_top",
@@ -378,20 +413,5 @@ public class GameActivity extends Activity {
             NativeLib.updateGame(0.016f);
             NativeLib.renderFrame();
         }
-    }
-
-    protected void onPause() {
-        super.onPause();
-        if (glView != null) glView.onPause();
-    }
-
-    protected void onResume() {
-        super.onResume();
-        if (glView != null) glView.onResume();
-    }
-
-    protected void onDestroy() {
-        super.onDestroy();
-        NativeLib.destroyWorld();
     }
 }
